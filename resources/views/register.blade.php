@@ -18,6 +18,11 @@
             <div class="card-body">
                 <form action="{{ route('save.user') }}" method="POST">
                     @csrf
+                    @if(session('success'))
+                        <div style="padding: 15px; background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; border-radius: 4px;">
+                            {{ session('success') }}
+                        </div>
+                    @endif
                     <div class="mb-3">
                         <label class="form-label fw-bold">Full Name</label>
                         <input type="text" name="name" class="form-control" placeholder="Jane Doe" required>

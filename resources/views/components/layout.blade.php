@@ -134,9 +134,9 @@
         <h4 class="fw-bold text-white"><i class="fas fa-shield-alt me-2"></i>ProAdmin</h4>
     </div>
     <div class="nav flex-column">
-        <button class="nav-link active" onclick="showSection('dashboard-overview')">
+        <a href="{{ route('admin.dash') }}" class="nav-link active" onclick="showSection('dashboard-overview')">
             <i class="fas fa-th-large"></i> Dashboard
-        </button>
+</a>
         <button onclick="showSection('houseform')" class="nav-link"><i class="fas fa-home"></i> Add House</button>
         <button onclick="showSection('holderform')" class="nav-link"><i class="fas fa-user-plus"></i> Add Holder</button>
         <button onclick="showSection('staffform')" class="nav-link"><i class="fas fa-user-gear"></i> Add Staff</button>
@@ -152,7 +152,6 @@
 </nav>
 
 <div id="main-content">
-    
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h2 class="fw-bold">Welcome back, {{ Auth::user()->name }}</h2>
@@ -168,52 +167,7 @@
         </div>
     </div>
 
-    <div id="dashboard-overview" class="content-section active">
-        <div class="row g-4 mb-5">
-            <div class="col-md-4 col-lg-2">
-                <div class="action-card" onclick="showSection('adminslist')">
-                    <div class="action-icon"><i class="fas fa-users-cog"></i></div>
-                    <h3><a href="{{ route('commite')}}">Committee</a></h3>
-                    <p class="small text-muted">Manage Admins</p>
-                </div>
-            </div>
-            <div class="col-md-4 col-lg-2">
-                <div class="action-card" onclick="showSection('houses')">
-                    <div class="action-icon"><i class="fas fa-home"></i></div>
-                    <h3>Houses</h3>
-                    <p class="small text-muted">View Property</p>
-                </div>
-            </div>
-            <div class="col-md-4 col-lg-2">
-                <div class="action-card" onclick="showSection('holders')">
-                    <div class="action-icon"><i class="fas fa-id-card"></i></div>
-                    <h3>Holders</h3>
-                    <p class="small text-muted">Owner Directory</p>
-                </div>
-            </div>
-            <div class="col-md-4 col-lg-2">
-                <div class="action-card" onclick="showSection('complaintslist')">
-                    <div class="action-icon"><i class="fas fa-exclamation-circle"></i></div>
-                    <h3>Complaints</h3>
-                    <p class="small text-muted">Support Tickets</p>
-                </div>
-            </div>
-            <div class="col-md-4 col-lg-2">
-                <div class="action-card" onclick="showSection('stafflist')">
-                    <div class="action-icon"><i class="fas fa-tools"></i></div>
-                    <h3>Staff</h3>
-                    <p class="small text-muted">Maintenance</p>
-                </div>
-            </div>
-            <div class="col-md-4 col-lg-2">
-                <div class="action-card" onclick="showSection('billslist')">
-                    <div class="action-icon"><i class="fas fa-file-invoice"></i></div>
-                    <h3>Bills</h3>
-                    <p class="small text-muted">Payments</p>
-                </div>
-            </div>
-        </div>
-    </div>
+      
 <!-- add holder -->
     <div id="holderform" class="content-section">
         <div class="card col-lg-5 mx-auto">
@@ -425,133 +379,8 @@
         </div>
     </div>
 <!-- add staff ends  -->
- <!-- admin list  -->
-    <div id="adminslist" class="content-section">
-        <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <span><i class="fas fa-users-cog me-2"></i>Committee & Admin List</span>
-                <button class="btn btn-sm btn-light" onclick="showSection('dashboard-overview')">Back</button>
-            </div>
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
-                    <thead class="table-light"><tr><th>#</th><th>Full Name</th><th>Email Address</th><th>Role</th></tr></thead>
-                    <tbody>
-                        @isset($committe)
-                        @foreach($committe as $member)
-                        <tr>
-                            <td>{{ $loop->iteration }}</td>
-                            <td class="fw-bold">{{ $member->name }}</td>
-                            <td>{{ $member->email }}</td>
-                            <td><span class="badge bg-soft-primary text-primary border">{{ $member->role }}</span></td>
-                        </tr>
-                        @endforeach
-                        @else
-            <tr>
-                <td colspan="4" class="text-center">No committee members found.</td>
-            </tr>
-        @endisset
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-<!-- house list  -->
-    <div id="houses" class="content-section">
-        <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <span><i class="fas fa-home me-2"></i>Houses Directory</span>
-                <button class="btn btn-sm btn-light" onclick="showSection('dashboard-overview')">Back</button>
-            </div>
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
-                    <thead class="table-light"><tr><th>House No</th><th>Owner Name</th><th>Owner Email</th><th>Status</th></tr></thead>
-                    <tbody>
-                        <tr><td class="fw-bold">101-A</td><td>Charlie Brown</td><td>charlie@mail.com</td><td><span class="status-badge bg-success text-white">OCCUPIED</span></td></tr>
-                        <tr><td class="fw-bold">102-B</td><td>David Wilson</td><td>david@mail.com</td><td><span class="status-badge bg-warning text-dark">VACANT</span></td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-<!-- holders list  -->
-    <div id="holders" class="content-section">
-        <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <span><i class="fas fa-id-card me-2"></i>Owners Directory</span>
-                <div class="d-flex gap-2 align-items-center">
-                    <input type="search" id="ownerSearch" class="form-control form-control-sm" placeholder="Search owners...">
-                    <button class="btn btn-sm btn-light" onclick="showSection('dashboard-overview')">Back</button>
-                </div>
-            </div>
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
-                    <thead class="table-light"><tr><th>#</th><th>Full Name</th><th>Email Address</th><th>House No</th><th>Status</th></tr></thead>
-                    <tbody>
-                        <tr><td>1</td><td class="fw-bold">Eve Adams</td><td>eve@mail.com</td><td>101-A</td><td><span class="status-badge bg-success text-white">owner</span></td></tr>
-                        <tr><td>2</td><td class="fw-bold">Frank Miller</td><td>frank@mail.com</td><td>105-C</td><td><span class="status-badge bg-secondary text-dark">member</span></td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-<!-- complaint list  -->
-    <div id="complaintslist" class="content-section">
-        <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <span><i class="fas fa-exclamation-circle me-2"></i>Complaints List</span>
-                <button class="btn btn-sm btn-light" onclick="showSection('dashboard-overview')">Back</button>
-            </div>
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
-                    <thead class="table-light"><tr><th>#</th><th>Owner Name</th><th>House No</th><th>Complaint</th><th>Status</th></tr></thead>
-                    <tbody>
-                        <tr><td>1</td><td class="fw-bold">Charlie Brown</td><td>101-A</td><td>Leaking pipe in kitchen</td><td><span class="status-badge bg-danger text-white">open</span></td></tr>
-                        <tr><td>2</td><td class="fw-bold">David Wilson</td><td>102-B</td><td>Security light broken</td><td><span class="status-badge bg-success text-white">closed</span></td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-<!-- staff list  -->
-    <div id="stafflist" class="content-section">
-        <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <span><i class="fas fa-tools me-2"></i>Staff Directory</span>
-                <button class="btn btn-sm btn-light" onclick="showSection('dashboard-overview')">Back</button>
-            </div>
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
-                    <thead class="table-light"><tr><th>#</th><th>Full Name</th><th>Email Address</th><th>Staff Type</th><th>Role</th></tr></thead>
-                    <tbody>
-                        <tr><td>1</td><td class="fw-bold">George Green</td><td>george@staff.com</td><td>Staff</td><td><span class="badge bg-soft-primary text-primary border">Electrician</span></td></tr>
-                        <tr><td>2</td><td class="fw-bold">Hannah White</td><td>hannah@staff.com</td><td>Staff</td><td><span class="badge bg-soft-primary text-primary border">Security</span></td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-<!-- bill list  -->
-    <div id="billslist" class="content-section">
-        <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <span>Financial Overview</span>
-                <select class="form-select form-select-sm" id="fetchval" style="width: auto;">
-                    <option value="All">All Bills</option>
-                    <option value="pending">Pending</option>
-                    <option value="paid">Paid</option>
-                </select>
-            </div>
-            <div class="table-responsive">
-                <table class="table table-hover align-middle">
-                    <thead class="table-light"><tr><th>Unit</th><th>Bill Type</th><th>Amount</th><th>Period</th><th>Status</th></tr></thead>
-                    <tbody id="billdata">
-                        <tr><td>101-A</td><td>Electricity Bill</td><td class="fw-bold text-dark">$45.00</td><td>January</td><td><span class="status-badge bg-success text-white">PAID</span></td></tr>
-                        <tr><td>102-B</td><td>Water Bill</td><td class="fw-bold text-dark">$20.00</td><td>February</td><td><span class="status-badge bg-warning text-dark">PENDING</span></td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
+
+{{ $slot }}
 
 </div>
 

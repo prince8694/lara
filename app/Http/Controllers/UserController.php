@@ -35,7 +35,6 @@ class UserController extends Controller
             'password' => 'required'
         ]);
         if(auth()->attempt(['email'=>$request->email,'password'=> $request->password])){
-                $committe=User::where('committee','=','1')->get();
                 return redirect()->route('admin.dash')->with('success', 'Welcome to the Admin Panel');
             }
             return back()->with('error', 'incorrect credentials');
@@ -51,8 +50,8 @@ class UserController extends Controller
     }
 
     public function showcommitte(){
-        $committe=User::where('committee','=','1')->get();
-        return view('admin_dashboard',compact('committe'));
+        $committee=User::where('committee','=','1')->get();
+        return view('committe',compact('committee'));
     }
 }
 
