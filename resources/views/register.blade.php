@@ -11,12 +11,13 @@
     <!-- admin form section -->
     <div id="adminform" class="content-section">
         <div class="card col-lg-5 mx-auto">
-            <div class="card-header d-flex justify-content-between align-items-center bg-dark text-white">
+            <div class="card-header d-flex justify-content-between align-items-center bg-dark text-white"> 
                 <span>Register New admin</span>
                 <button type="button" class="btn-close btn-close-white" aria-label="Close" onclick="showSection('dashboard-overview')"></button>
             </div>
             <div class="card-body">
-                <form method="POST">
+                <form action="{{ route('save.user') }}" method="POST">
+                    @csrf
                     <div class="mb-3">
                         <label class="form-label fw-bold">Full Name</label>
                         <input type="text" name="name" class="form-control" placeholder="Jane Doe" required>
@@ -24,7 +25,8 @@
                     <div class="mb-3">
                         <label class="form-label fw-bold">Email Address</label>
                         <input type="email" name="email" class="form-control" placeholder="admin @example.com" required>
-                    </div>  
+                    </div>
+                    <input type="hidden" name="user_type" value="committee">
                     <div class="mb-3">
                         <label class="form-label fw-bold">Role</label>
                         <select name="role" class="form-select" required>
