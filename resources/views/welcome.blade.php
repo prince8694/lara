@@ -1,4 +1,6 @@
-
+@if(Auth::check())
+    {{ redirect()->route('admin.dash') }}
+@endif
 <!DOCTYPE html>
 <html lang="en">
 <head>

@@ -18,9 +18,21 @@ class HomeController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(Request $request)
     {
-        //
+        $request->validate([
+            'houseNo'=>'required',
+            'status'=>'required',
+            'user_id'=>'nullable'
+        ]); 
+        $data=new Home();
+        $data->house_no=$request['houseNo'];
+        $data->save();
+        if($data){
+            return redirect()->route('admin.dash')->with('success','Home added successfully...');
+        }else{
+            return back()->with('error', 'not added');
+        };
     }
 
     /**

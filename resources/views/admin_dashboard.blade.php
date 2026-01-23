@@ -1,3 +1,6 @@
+@if(!Auth::check())
+    return redirect()->route('home');
+@endif
 <!DOCTYPE html>
 <html lang="en">
 
@@ -222,7 +225,8 @@
                 <button type="button" class="btn-close btn-close-white" aria-label="Close" onclick="showSection('dashboard-overview')"></button>
             </div>
             <div class="card-body">
-                <form method="post">
+                <form action="{{ route('save.user') }}" method="post">
+                    @csrf
                     <div class="mb-3">
                         <label class="form-label">Full Name</label>
                         <div class="input-group">
@@ -276,11 +280,13 @@
                 <button type="button" class="btn-close btn-close-white" aria-label="Close" onclick="showSection('dashboard-overview')"></button>
             </div>
             <div class="card-body">
-                <form method="POST">
+                <form action="{{ route('add.home') }}" method="POST">
+                    @csrf
                     <div class="mb-4">
                         <label for="houseNo" class="form-label">House Number / Unit ID</label>
                         <div class="input-group">
                             <span class="input-group-text bg-light text-muted border-end-0"><i class="fas fa-door-open"></i></span>
+                            <input type="hidden" name="status" value= 0>
                             <input type="text" class="form-control border-start-0" id="houseNo" name="houseNo" placeholder="e.g. 123-A" required>
                         </div>
                     </div>
@@ -436,15 +442,15 @@
                 <table class="table table-hover align-middle mb-0">
                     <thead class="table-light"><tr><th>#</th><th>Full Name</th><th>Email Address</th><th>Role</th></tr></thead>
                     <tbody>
-                        @isset($committe)
-                        @foreach($committe as $member)
-                        <tr>
+                        @if(isset($committee))
+                            @foreach($committee as $member)
+                            <tr>
                             <td>{{ $loop->iteration }}</td>
                             <td class="fw-bold">{{ $member->name }}</td>
                             <td>{{ $member->email }}</td>
                             <td><span class="badge bg-soft-primary text-primary border">{{ $member->role }}</span></td>
-                        </tr>
-                        @endforeach
+                            </tr>
+                            @endforeach
                         @else
             <tr>
                 <td colspan="4" class="text-center">No committee members found.</td>
@@ -464,10 +470,34 @@
             </div>
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0">
-                    <thead class="table-light"><tr><th>House No</th><th>Owner Name</th><th>Owner Email</th><th>Status</th></tr></thead>
+                    <thead class="table-light">
+                        <tr>
+                            <th>#</th>
+                            <th>House No</th>
+                            <th>Owner Name</th>
+                            <th>Owner Email</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
                     <tbody>
-                        <tr><td class="fw-bold">101-A</td><td>Charlie Brown</td><td>charlie@mail.com</td><td><span class="status-badge bg-success text-white">OCCUPIED</span></td></tr>
-                        <tr><td class="fw-bold">102-B</td><td>David Wilson</td><td>david@mail.com</td><td><span class="status-badge bg-warning text-dark">VACANT</span></td></tr>
+                        @if(isset($homes))
+                            @foreach($homes as $home)
+                        <tr>
+                            <td>{{ $loop->iteration }}</td>
+                            <td class="fw-bold">{{ $home->house_no }}</td>
+                            <td>David Wilson</td>
+                            <td>david@mail.com</td>
+                            <td><span class="status-badge bg-warning text-dark">VACANT</span></td>
+                            <td>
+                        </tr>
+                        @endforeach
+                        @else
+                            <tr>
+                                <td colspan="4" class="text-center">No homes found.</td>
+                            </tr>
+                        @endisset
+
                     </tbody>
                 </table>
             </div>

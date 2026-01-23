@@ -4,10 +4,14 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\Home;
 
 class UserController extends Controller
 {
     public function loginpage(){
+        if(auth()->check()){
+            return redirect()->route('admin.dash');
+        }
         return view('login');
     }
 
@@ -35,23 +39,27 @@ class UserController extends Controller
             'password' => 'required'
         ]);
         if(auth()->attempt(['email'=>$request->email,'password'=> $request->password])){
+            
+                $committee=User::where('committee','=','1')->get();
                 return redirect()->route('admin.dash')->with('success', 'Welcome to the Admin Panel');
             }
             return back()->with('error', 'incorrect credentials');
 
     }
-
+// admin page display function
     public function admin(){
-        return view('admin_dashboard');
+        $committee = User::where('committee','=','1')->get();
+        $homes = Home::all();
+        return view('admin_dashboard', compact('committee', 'homes'));
     }
     public function logout(Request $request){
         auth()->logout();
         return redirect()->route('home')->with('success','User logged out...');
     }
-
+// committe page 
     public function showcommitte(){
         $committee=User::where('committee','=','1')->get();
-        return view('committe',compact('committee'));
+        return view('committe',compact('committee','homes'));
     }
 }
 
