@@ -176,7 +176,7 @@
             <div class="col-md-4 col-lg-2">
                 <div class="action-card" onclick="showSection('adminslist')">
                     <div class="action-icon"><i class="fas fa-users-cog"></i></div>
-                    <h3><a href="{{ route('commite')}}">Committee</a></h3>
+                    <h3>Committee</h3>
                     <p class="small text-muted">Manage Admins</p>
                 </div>
             </div>
@@ -216,7 +216,31 @@
                 </div>
             </div>
         </div>
+        
     </div>
+@if(session('success'))
+    <script>
+        alert("{{ session('success') }}");
+    </script>
+@endif
+
+@if(session('error'))
+    <script>
+        alert("{{ session('error') }}");
+    </script>
+@endif
+
+@if ($errors->any())
+    <div class="alert alert-danger">
+        <strong>Whoops!</strong>
+        <ul>
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
+
 <!-- add holder -->
     <div id="holderform" class="content-section">
         <div class="card col-lg-5 mx-auto">
@@ -244,11 +268,17 @@
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label class="form-label">House Number</label>
-                            <input type="text" name="house_no" class="form-control" placeholder="Unit 101" required>
+                            <select name="house_no" class="form-select" required>
+                                <option selected disabled>--House Number--</option>
+                                @foreach($vacantHomes as $vhome)
+                                <option value="{{ $vhome->house_no }}">{{ $vhome->house_no }}</option>
+                                @endforeach
+                            </select>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">User Type</label>
-                            <select name="member_type" class="form-select" required>
+                            <label class="form-label">Holder Type</label>
+                            <select name="user_type" class="form-select" required>
+                                <option selected disabled>--Owner or Member--</option>
                                 <option value="owner">Owner</option>
                                 <option value="member">Member</option>
                             </select>
@@ -486,10 +516,18 @@
                         <tr>
                             <td>{{ $loop->iteration }}</td>
                             <td class="fw-bold">{{ $home->house_no }}</td>
-                            <td>David Wilson</td>
+                            @if(isset($home->owner_id))
+                            <td>{{ $home->owner_id }}</td>
                             <td>david@mail.com</td>
-                            <td><span class="status-badge bg-warning text-dark">VACANT</span></td>
+                            @else
+                            <td></td>
+                            <td></td>
+                            @endif
                             <td>
+                                <span class="status-badge text-dark {{ $home->house_status == 0 ? 'bg-success' : 'bg-warning' }}">
+                                    {{ $home->house_status == 0 ? 'Vacant' : 'Occupied' }}
+                                </span>
+                            </td>
                         </tr>
                         @endforeach
                         @else
@@ -515,10 +553,33 @@
             </div>
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0">
-                    <thead class="table-light"><tr><th>#</th><th>Full Name</th><th>Email Address</th><th>House No</th><th>Status</th></tr></thead>
+                    <thead class="table-light">
+                        <tr>
+                            <th>#</th>
+                            <th>Full Name</th>
+                            <th>Email Address</th>
+                            <th>House No</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
                     <tbody>
-                        <tr><td>1</td><td class="fw-bold">Eve Adams</td><td>eve@mail.com</td><td>101-A</td><td><span class="status-badge bg-success text-white">owner</span></td></tr>
-                        <tr><td>2</td><td class="fw-bold">Frank Miller</td><td>frank@mail.com</td><td>105-C</td><td><span class="status-badge bg-secondary text-dark">member</span></td></tr>
+                        @foreach($holders as $holder)
+                        <tr>
+                            <td>{{ $loop->iteration }}</td>
+                            <td class="fw-bold">{{ $holder->name }}</td>
+                            <td>{{ $holder->email }}</td><td>{{ $holder->house_no }}</td>
+                            <td><span class="status-badge bg-success text-white">{{ $holder->user_type }}</span></td>
+                            <td class="text-left">
+                                <a href="{{ route('edit.holder') }}" class="text-primary me-3" title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="#" class="text-danger" title="Delete">
+                                    <i class="fas fa-trash-alt"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        @endforeach
                     </tbody>
                 </table>
             </div>
@@ -533,7 +594,15 @@
             </div>
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0">
-                    <thead class="table-light"><tr><th>#</th><th>Owner Name</th><th>House No</th><th>Complaint</th><th>Status</th></tr></thead>
+                    <thead class="table-light">
+                        <tr>
+                            <th>#</th>
+                            <th>Owner Name</th>
+                            <th>House No</th>
+                            <th>Complaint</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
                     <tbody>
                         <tr><td>1</td><td class="fw-bold">Charlie Brown</td><td>101-A</td><td>Leaking pipe in kitchen</td><td><span class="status-badge bg-danger text-white">open</span></td></tr>
                         <tr><td>2</td><td class="fw-bold">David Wilson</td><td>102-B</td><td>Security light broken</td><td><span class="status-badge bg-success text-white">closed</span></td></tr>
