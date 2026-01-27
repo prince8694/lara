@@ -270,7 +270,7 @@
                             <label class="form-label">House Number</label>
                             <select name="house_no" class="form-select" required>
                                 <option selected disabled>--House Number--</option>
-                                @foreach($vacantHomes as $vhome)
+                                @foreach($homes as $vhome)
                                 <option value="{{ $vhome->house_no }}">{{ $vhome->house_no }}</option>
                                 @endforeach
                             </select>
@@ -528,6 +528,29 @@
                                     {{ $home->house_status == 0 ? 'Vacant' : 'Occupied' }}
                                 </span>
                             </td>
+                            <td>
+                                <div class="d-flex gap-2">
+                                <a href="" class="btn btn-outline-primary btn-sm" title="Change Owner">
+                                    <i class="fas fa-exchange-alt"></i>
+                                </a>
+
+                                <form action="" method="POST">
+                                    @csrf
+                                    @method('PATCH')
+                                    <button type="submit" title="Remove Owner" class="btn btn-outline-warning btn-sm" onclick="return confirm('Demote this owner to a member?')">
+                                        <i class="fas fa-user-minus"></i>
+                                    </button>
+                                </form>
+
+                                <form action="" method="POST">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" title="Delete house" class="btn btn-outline-danger btn-sm" onclick="return confirm('Are you sure? This deletes the entire house record!')">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </form>
+                            </div>
+                            </td>
                         </tr>
                         @endforeach
                         @else
@@ -535,7 +558,7 @@
                                 <td colspan="4" class="text-center">No homes found.</td>
                             </tr>
                         @endisset
-
+                        
                     </tbody>
                 </table>
             </div>
@@ -568,13 +591,14 @@
                         <tr>
                             <td>{{ $loop->iteration }}</td>
                             <td class="fw-bold">{{ $holder->name }}</td>
-                            <td>{{ $holder->email }}</td><td>{{ $holder->house_no }}</td>
+                            <td>{{ $holder->email }}</td>
+                            <td>{{ $holder->house_no }}</td>
                             <td><span class="status-badge bg-success text-white">{{ $holder->user_type }}</span></td>
                             <td class="text-left">
-                                <a href="{{ route('edit.holder') }}" class="text-primary me-3" title="Edit">
+                                <a href="{{ route('edit.holder', $holder->id)}}" class="text-primary me-3" title="Edit">
                                     <i class="fas fa-edit"></i>
                                 </a>
-                                <a href="#" class="text-danger" title="Delete">
+                                <a href="{{ route('dlt.holder', $holder->id)}}" class="text-danger" title="Delete">
                                     <i class="fas fa-trash-alt"></i>
                                 </a>
                             </td>

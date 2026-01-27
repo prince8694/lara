@@ -137,7 +137,7 @@
         <a href="{{ route('admin.dash') }}" class="nav-link active" onclick="showSection('dashboard-overview')">
             <i class="fas fa-th-large"></i> Dashboard
 </a>
-
+        
 
         <hr class="mx-3 opacity-25">
         <a href="#" class="nav-link"><i class="fas fa-home"></i> Home</a>
@@ -147,13 +147,18 @@
         </form>
     </div>
 </nav>
-<div class="d-flex justify-content-between align-items-center mb-4">
+
+<div id="main-content">
+    <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h2 class="fw-bold">Welcome back, {{ Auth::user()->name }}</h2>
             <p class="text-muted">Role: <span class="badge bg-primary"> {{ Auth::user()->role }} </span></p>
         </div>
+        
+    </div>
 
-</div>
+
+
 {{ $slot }}
 
 </div>

@@ -17,7 +17,9 @@ Route::get('/Loginuser', [UserController::class, 'loginpage'])->name('loginform'
 Route::post('/login', [UserController::class, 'login' ])->name('login');
 Route::get('/Registeruser', [UserController::class, 'register'])->name('register');
 Route::post('/saveuser', [UserController::class, 'saveuser'])->name('save.user');
-Route::get('/editholder', [UserController::class, 'editholder'])->name('edit.holder');
+Route::get('/edit-holder/{userid}', [UserController::class, 'editholder'])->name('edit.holder');
+Route::put('/update-holder', [UserController::class, 'updateholder'])->name('update.holder');
+Route::get('/delete-holder/{userid}', [UserController::class, 'dltholder'])->name('dlt.holder');
 Route::get('/admin-dashboard', [UserController::class, 'admin'])->name('admin.dash');
 Route::post('/logout', [UserController::class, 'logout'])->name('user.logout');
 Route::post('/savehome', [HomeController::class, 'create'])->name('add.home');
