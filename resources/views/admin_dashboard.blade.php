@@ -1,6 +1,9 @@
 @if(!Auth::check())
-    return redirect()->route('home');
+    return redirect()->route('index');
 @endif
+@if(Auth::user()->committee != 1)
+    return redirect()->route('home');
+    @endif
 <!DOCTYPE html>
 <html lang="en">
 
@@ -146,7 +149,7 @@
         <button onclick="showSection('billform')" class="nav-link"><i class="fas fa-file-invoice-dollar"></i> Add Bill</button>
 
         <hr class="mx-3 opacity-25">
-        <a href="#" class="nav-link"><i class="fas fa-home"></i> Home</a>
+        <a href="{{ route('home') }}" class="nav-link"><i class="fas fa-home"></i> Home</a>
         <form method="POST" action="{{ route('user.logout') }}" style="display:inline;">
             @csrf
             <button type="submit" class="nav-link text-danger" style="background:none;border:none;cursor:pointer;"><i class="fas fa-sign-out-alt"></i> Logout</button>
@@ -443,19 +446,30 @@
                 <button type="button" class="btn-close btn-close-white" aria-label="Close" onclick="showSection('dashboard-overview')"></button>
             </div>
             <div class="card-body">
-                <form method="post">
-                    <div class="mb-3"><label class="form-label">Full Name</label><input type="text" name="sname" class="form-control" placeholder="Enter full name" required></div>
+                <form action="{{ route('save.user') }}" method="post">
+                    @csrf
+                    <div class="mb-3"><label class="form-label">Full Name</label>
+                    <input type="text" name="name" class="form-control" placeholder="Enter full name" required>
+                </div>
+                <input type="hidden" name="user_type" value="Staff">
                     <div class="mb-3">
                         <label class="form-label">Staff role</label>
-                        <select name="srole" class="form-select" required>
+                        <select name="role" class="form-select" required>
                             <option value="Electrician">Electrician</option>
                             <option value="Plumber">Plumber</option>
+                            <option value="Cleaner">Cleaner</option> 
                             <option value="Security">Security</option>
                         </select>
                     </div>
-                    <div class="mb-3"><label class="form-label">Email Address</label><input type="email" name="semail" class="form-control" placeholder="Enter email" required></div>
-                    <div class="mb-3"><label class="form-label">Password</label><input type="password" name="spassword" class="form-control" required></div>
-                    <div class="d-grid"><button type="submit" class="btn btn-primary">Register</button></div>
+                    <div class="mb-3">
+                        <label class="form-label">Email Address</label>
+                        <input type="email" name="email" class="form-control" placeholder="Enter email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Password</label>
+                        <input type="password" name="password" class="form-control" required>
+                    </div>
+                    <div class="d-grid"><button type="submit" class="btn btn-primary">Add Staff</button></div>
                 </form>
             </div>
         </div>
@@ -516,9 +530,9 @@
                         <tr>
                             <td>{{ $loop->iteration }}</td>
                             <td class="fw-bold">{{ $home->house_no }}</td>
-                            @if(isset($home->owner_id))
-                            <td>{{ $home->owner_id }}</td>
-                            <td>david@mail.com</td>
+                            @if($home->owner)
+                            <td>{{ $home->owner->name }}</td>
+                            <td>{{ $home->owner->email }}</td>
                             @else
                             <td></td>
                             <td></td>
@@ -529,8 +543,9 @@
                                 </span>
                             </td>
                             <td>
+                                @if($home->owner_id)
                                 <div class="d-flex gap-2">
-                                <a href="" class="btn btn-outline-primary btn-sm" title="Change Owner">
+                                <a href="{{ route('change.owner', $home->id) }}" class="btn btn-outline-primary btn-sm" title="Change Owner">
                                     <i class="fas fa-exchange-alt"></i>
                                 </a>
 
@@ -550,6 +565,25 @@
                                     </button>
                                 </form>
                             </div>
+                                @else
+                                <div class="d-flex gap-2">
+                                    <form action="" method="POST">
+                                    @csrf
+                                    @method('PATCH')
+                                    <button type="submit" title="Add owner" class="btn btn-outline-success btn-sm">
+                                        <i class="fas fa-user-plus"></i>
+                                    </button>
+                                </form>
+
+                                <form action="" method="POST">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" title="Delete house" class="btn btn-outline-danger btn-sm" onclick="return confirm('Are you sure? This deletes the entire house record!')">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </form>
+                            </div>
+                                @endif
                             </td>
                         </tr>
                         @endforeach
@@ -644,13 +678,37 @@
             </div>
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0">
-                    <thead class="table-light"><tr><th>#</th><th>Full Name</th><th>Email Address</th><th>Staff Type</th><th>Role</th></tr></thead>
+                    <thead class="table-light">
+                        <tr>
+                            <th>#</th>
+                            <th>Full Name</th>
+                            <th>Email Address</th>
+                            <th>Role</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
                     <tbody>
-                        <tr><td>1</td><td class="fw-bold">George Green</td><td>george@staff.com</td><td>Staff</td><td><span class="badge bg-soft-primary text-primary border">Electrician</span></td></tr>
-                        <tr><td>2</td><td class="fw-bold">Hannah White</td><td>hannah@staff.com</td><td>Staff</td><td><span class="badge bg-soft-primary text-primary border">Security</span></td></tr>
+                        
+            @foreach($staffs as $staff)
+                        <tr>
+                            <td>{{ $loop->iteration }}</td>
+                            <td class="fw-bold">{{ $staff->name }}</td>
+                            <td>{{ $staff->email }}</td>
+                            <td><span class="badge bg-soft-primary text-primary border">{{ $staff->role }}</span></td>
+                            <td class="text-left">
+                                <a href="{{ route('edit.holder', $staff->id)}}" class="text-primary me-3" title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="{{ route('dlt.holder', $staff->id)}}" class="text-danger" title="Delete">
+                                    <i class="fas fa-trash-alt"></i>
+                                </a>
+                            </td>
+                        </tr>
+                         @endforeach
                     </tbody>
                 </table>
             </div>
+           
         </div>
     </div>
 <!-- bill list  -->

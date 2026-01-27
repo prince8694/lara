@@ -21,4 +21,8 @@ class Home extends Model
         'owner_id',
         'house_status'
     ];
+
+    public function owner(){
+        return $this->hasOne(User::class,'id','owner_id');
+    }
 }

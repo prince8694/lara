@@ -31,10 +31,11 @@
                         <label class="form-label">Email Address</label>
                         <div class="input-group">
                             <span class="input-group-text bg-light text-muted border-end-0"><i class="fas fa-envelope"></i></span>
-                            <input type="email" name="email" class="form-control border-start-0" value="{{ $holder->email }}" placeholder="name@example.com" required>
+                            <input type="email" name="email" class="form-control border-start-0" value="{{ $holder->email }}" placeholder="name@example.com">
                         </div>
                         <input type="hidden" name="id" value="{{ $holder->id }}">
                     </div>
+                    @if(auth()->user()->user_type == 'staff')
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label class="form-label">House Number</label>
@@ -55,6 +56,18 @@
                             </select>
                         </div>
                     </div>
+                    @else
+                    <input type="hidden" name="user_type" value="Staff">
+                    <div class="mb-3">
+                        <label class="form-label">Staff role</label>
+                        <select name="role" class="form-select" required>
+                            <option value="Electrician">Electrician</option>
+                            <option value="Plumber">Plumber</option>
+                            <option value="Cleaner">Cleaner</option> 
+                            <option value="Security">Security</option>
+                        </select>
+                    </div>
+                    @endif
                     <div class="d-grid">
                         <button type="submit" class="btn btn-primary">
                             <i class="fas fa-refresh me-2"></i>Update

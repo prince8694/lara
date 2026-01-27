@@ -26,7 +26,7 @@ class UserController extends Controller
             'house_no'=>'nullable',
             'password'=> 'required',
             'user_type'=>'nullable',
-            'role'=>'nullable',
+            'role'=>'nullable', 
             'committee'=>'nullable'
         ]);
         if($request['user_type']=='member'){
@@ -52,26 +52,33 @@ class UserController extends Controller
             'password' => 'required'
         ]);
         if(auth()->attempt(['email'=>$request->email,'password'=> $request->password])){
-            
-                $committee=User::where('committee','=','1')->get();
+            if(auth()->user()->user_type == 'committee'){
                 return redirect()->route('admin.dash')->with('success', 'Welcome to the Admin Panel');
+            }else if(auth()->user()->user_type == 'owner' || auth()->user()->user_type == 'member'){
+                return redirect()->route('home')->with('success', 'Welcome to the Admin Panel');
             }
+        }
             return back()->with('error', 'incorrect credentials');
 
     }
 // admin page display function
     public function admin(){
         
-        $holders=User::whereIn('user_type',['owner','member'])->orderBy('house_no', 'asc')->get();
+        $holders=User::whereIn('user_type',['owner','member'])->orderBy('house_no', 'asc')->get(); //users where user type is owner or member order by house no
+        $staffs=User::where('user_type','=','Staff')->get();
         $committee = User::where('committee','=','1')->get();
         $homes = Home::orderBy('house_no', 'asc')->get();;
         $vacantHomes= Home::where('house_status','0')->get();
         $occupiedHomes =Home::where('house_status','1')->get();
-        return view('admin_dashboard', compact('committee', 'homes','vacantHomes','occupiedHomes','holders'));
+        return view('admin_dashboard', compact('committee', 'homes','vacantHomes','occupiedHomes','holders','staffs'));
     }
     public function logout(Request $request){
         auth()->logout();
-        return redirect()->route('home')->with('success','User logged out...');
+        return redirect()->route('index')->with('success','User logged out...');
+    }
+
+    public function home(){
+        return view('home');
     }
 // edit page
     public function editholder($id){
@@ -83,12 +90,12 @@ class UserController extends Controller
         $validated = $request->validate([
             'id'=>'required|exists:users,id',
             'name' =>'required',
-            'email'=>'required|email|unique:users,email'
+            'email'=>'nullable'
         ]);
         User::where('id',$validated['id'])->update([
             'name'=>$validated['name'],
             'email'=>$validated['email']
-        ]);
+        ]); //insert into users set () where id= $validated['id']
         return redirect()->route('admin.dash')->with('success','Updated successfully...');
     }
 
@@ -101,6 +108,12 @@ class UserController extends Controller
         }else{
             return back()->with('error', 'Cant delete...');
         }
+    }
+    public function changeowner($homeid){
+        $home=Home::find($homeid);
+        $home_no=$home->house_no;
+        $members=User::where('house_no',$home_no)->get();
+        return view('change_owner', compact('members', 'home_no'));
     }
     
 }
