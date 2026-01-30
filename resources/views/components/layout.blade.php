@@ -1,3 +1,9 @@
+@if (!Auth::check() || Auth::user()->role !== 'admin')
+    @php
+        header("Location: " . route('user.logout'));
+        exit();
+    @endphp
+@endif
 <!DOCTYPE html>
 <html lang="en">
 

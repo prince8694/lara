@@ -1,5 +1,5 @@
 @if(!Auth::check())
-    return redirect()->route('index');
+    return redirect()->route('user.logout');
 @endif
 @if(Auth::user()->committee != 1)
     return redirect()->route('home');

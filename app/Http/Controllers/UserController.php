@@ -115,6 +115,24 @@ class UserController extends Controller
         $members=User::where('house_no',$home_no)->get();
         return view('change_owner', compact('members', 'home_no'));
     }
+
+    public function updateowner(Request $request){
+        $validated = $request->validate([
+            'owner_id'=>'required',
+        ]);
+        $home_no = $request->input('home_no');
+        Home::where('house_no', $home_no)->update([
+            'owner_id'=>$validated['owner_id']
+        ]);
+        User::find($validated['owner_id'])->update([
+            'user_type'=>'owner'
+        ]);
+        User::where('house_no', $home_no)->where('id', '!=', $validated['owner_id'])->update([
+            'user_type'=>'member'
+        ]);
+        return redirect()->route('admin.dash')->with('success','Owner updated successfully...');
+
+    }
     
 }
 

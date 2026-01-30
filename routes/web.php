@@ -25,3 +25,5 @@ Route::post('/logout', [UserController::class, 'logout'])->name('user.logout');
 Route::post('/savehome', [HomeController::class, 'create'])->name('add.home');
 Route::get('/home', [UserController::class, 'home'])->name('home');
 Route::get('/change-owner/{homeid}', [UserController::class, 'changeowner'])->name('change.owner');
+
+Route::put('/update-owner',[UserController::class, 'updateowner'])->name('update.owner');
