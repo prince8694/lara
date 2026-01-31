@@ -405,29 +405,41 @@
                 <button type="button" class="btn-close btn-close-white" aria-label="Close" onclick="showSection('dashboard-overview')"></button>
             </div>
             <div class="card-body">
-                <form method="POST">
+                <form action="{{ route('add.bill') }}" method="POST">
+                    @csrf
                     <div class="mb-3">
                         <label for="house_no" class="form-label">House Number</label>
                         <select class="form-select" id="house_no" name="house_no" required>
                             <option value="" selected disabled>Choose house number...</option>
-                            <option value="101">101</option>
-                            <option value="102">102</option>
+                            @foreach($occupiedHomes as $home)
+                            <option value="{{ $home->id}}">{{ $home->house_no }}</option>
+                            @endforeach
                         </select>
                     </div>
+                    <input type="hidden" name="user_id" value="{{ Auth::user()->id }}">
                     <div class="mb-3">
                         <label for="bill" class="form-label">Bill Description</label>
                         <select class="form-select" id="bill" name="bill" required>
                             <option value="Electricity Bill">Electricity Bill</option>
                             <option value="Water Bill">Water Bill</option>
+                            <option value="internet Fee">Internet Fee</option>
+                            <option value="cleaning Bill">Cleaning Bill</option>
                             <option value="Maintenance Fee">Maintenance Fee</option>
                         </select>
                     </div>
-                    <div class="mb-3"><label class="form-label">Amount ($)</label><input type="number" class="form-control" name="amount" placeholder="0.00" required></div>
+                    <div class="mb-3"><label class="form-label">Amount ($)</label>
+                        <input type="number" class="form-control" name="amount" placeholder="0.00" required>
+                    </div>
                     <div class="mb-3">
                         <label class="form-label">Billing Month</label>
                         <select class="form-select" name="bill_month" required>
-                            <option value="January">January</option>
-                            <option value="February">February</option>
+                            @php
+                            $months=array("January","February","March","April","May","June","July","August","September","October","November","December");
+                            @endphp
+                            <option value="" selected disabled>Select month</option>
+                            @foreach($months as $month)
+                                <option value="{{ $month }}">{{ $month }}</option>
+                            @endforeach
                         </select>
                     </div>
                     <div class="d-grid gap-2 mt-4">
@@ -543,9 +555,9 @@
                                 </span>
                             </td>
                             <td>
-                                @if($home->owner_id)
                                 <div class="d-flex gap-2">
-                                <a href="{{ route('change.owner', $home->id) }}" class="btn btn-outline-primary btn-sm" title="Change Owner">
+                                @if($home->owner_id)
+                                <a href="{{ route('change.owner', $home->id) }}" class="btn btn-outline-primary btn-sm" title="Change Owner" onclick="return confirm('Demote this owner to a member?')">
                                     <i class="fas fa-exchange-alt"></i>
                                 </a>
 
@@ -556,34 +568,16 @@
                                         <i class="fas fa-user-minus"></i>
                                     </button>
                                 </form>
-
-                                <form action="" method="POST">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" title="Delete house" class="btn btn-outline-danger btn-sm" onclick="return confirm('Are you sure? This deletes the entire house record!')">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </button>
-                                </form>
-                            </div>
                                 @else
-                                <div class="d-flex gap-2">
-                                    <form action="" method="POST">
-                                    @csrf
-                                    @method('PATCH')
-                                    <button type="submit" title="Add owner" class="btn btn-outline-success btn-sm">
+                                    <button type="submit" title="Add owner" class="btn btn-outline-success btn-sm" onclick="showSection('holderform')">
                                         <i class="fas fa-user-plus"></i>
                                     </button>
-                                </form>
 
-                                <form action="" method="POST">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" title="Delete house" class="btn btn-outline-danger btn-sm" onclick="return confirm('Are you sure? This deletes the entire house record!')">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </button>
-                                </form>
-                            </div>
                                 @endif
+                                <a href="{{ route('delete.home', $home->id) }}" title="Delete house" class="btn btn-outline-danger btn-sm" onclick="return confirm('Are you sure? This deletes the entire house record!')">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </a>
+                            </div>
                             </td>
                         </tr>
                         @endforeach
@@ -724,10 +718,36 @@
             </div>
             <div class="table-responsive">
                 <table class="table table-hover align-middle">
-                    <thead class="table-light"><tr><th>Unit</th><th>Bill Type</th><th>Amount</th><th>Period</th><th>Status</th></tr></thead>
+                    <thead class="table-light">
+                        <tr>
+                            <th>Unit</th>
+                            <th>Bill Type</th>
+                            <th>Amount</th>
+                            <th>Month</th>
+                            <th>Generated By</th>
+                            <th>Status</th>
+                            @if(auth()->user()->role=='admin')
+                            <th>Action</th>
+                            @endif
+                        </tr>
+                    </thead>
                     <tbody id="billdata">
-                        <tr><td>101-A</td><td>Electricity Bill</td><td class="fw-bold text-dark">$45.00</td><td>January</td><td><span class="status-badge bg-success text-white">PAID</span></td></tr>
-                        <tr><td>102-B</td><td>Water Bill</td><td class="fw-bold text-dark">$20.00</td><td>February</td><td><span class="status-badge bg-warning text-dark">PENDING</span></td></tr>
+                        @foreach($bills as $bill)
+                        <tr>
+                            <td>{{ $bill->home->house_no }}</td>
+                            <td>{{ $bill->bill_type }}</td>
+                            <td class="fw-bold text-dark">{{ $bill->amount}}</td>
+                            <td>{{ $bill->month }}</td>
+                            <td>{{ $bill->generator->name }} ({{ $bill->generator->role }})</td>
+                            <td><span class="status-badge bg-success text-white">{{ $bill->status }}</span></td>
+                            @if(auth()->user()->role=='admin')
+                            <td><a href="{{ route('revoke.bill', $bill->id)}}" class="btn btn-danger" title="Revoke Bill">
+                                    <i class="fas fa-trash-alt"></i> Revoke
+                                </a>
+                            </td> 
+                            @endif   
+                        </tr>
+                        @endforeach
                     </tbody>
                 </table>
             </div>

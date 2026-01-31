@@ -3,6 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\EventController;
+use App\Http\Controllers\BillController;
 
 
 
@@ -23,7 +25,16 @@ Route::get('/delete-holder/{userid}', [UserController::class, 'dltholder'])->nam
 Route::get('/admin-dashboard', [UserController::class, 'admin'])->name('admin.dash');
 Route::post('/logout', [UserController::class, 'logout'])->name('user.logout');
 Route::post('/savehome', [HomeController::class, 'create'])->name('add.home');
-Route::get('/home', [UserController::class, 'home'])->name('home');
+Route::get('/home', [UserController::class, 'adminhome'])->name('home');
+Route::get('/userhome/{homeno}', [UserController::class, 'home'])->name('userhome');
 Route::get('/change-owner/{homeid}', [UserController::class, 'changeowner'])->name('change.owner');
 
 Route::put('/update-owner',[UserController::class, 'updateowner'])->name('update.owner');
+Route::get('/delete-home/{homeid}', [HomeController::class, 'dlthome'])->name('delete.home');
+
+Route::post('/save-event', [EventController::class, 'eventfun'])->name('events.store');
+Route::post('/addbill', [BillController::class, 'addbill'])->name('add.bill');
+Route::get('/revoke-bill/{billid}', [BillController::class, 'dltbill'])->name('revoke.bill');
+Route::get('/showbill', [BillController::class, 'showbill'])->name('show.my.bill');
+
+

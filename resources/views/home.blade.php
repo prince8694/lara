@@ -17,6 +17,17 @@
     </style>
 </head>
 <body> 
+@if(session('success'))
+    <script>
+        alert("{{ session('success') }}");
+    </script>
+@endif
+
+@if(session('error'))
+    <script>
+        alert("{{ session('error') }}");
+    </script>
+@endif
 
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
         <div class="container">
@@ -65,33 +76,45 @@
 <!-- admin provision ends -->
 
  <!-- add member -->
+  @if(auth()->user()['house_no'] != null)
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             Members
                             
                                 <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                                    
+                                    {{ count($members)}}
                                     <span class="visually-hidden">unread messages</span>
                                 </span>
                             
                         </a>
                                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navDropdown">
-                                    
-                                    <li class="dropdown-header d-flex px-3 justify-content-evenly">
-                                        mem_name
+                                    @foreach($members as $member)
+                                    <div>
+                                    <li class="dropdown-header d-flex px-3 justify-content-between">
+                                       
+                                        <p class="text-black fw-bold">{{ $member->name }}
+                                            @if($member->user_type == 'owner')
+                                            -{{ $member->user_type }} 
+                                            @endif</p>
+                                
+                            @if(auth()->user()['user_type'] == 'owner') 
+                                @if($member->user_type != 'owner')       
                                 <!-- <a class=" dropdown-item text-success" href="profile.php"> &#x2714;</a> -->
                                  <form method="post" class= "d-inline" onsubmit = "return confirm('are you sure to delete??');">
                                     <input type="hidden" value="delete" name="action">
-                                    <input type="hidden" value="" name="memId">
+                                    <input type="hidden" value="{{ $member->id }}" name="memId">
                                 <button class="dropdown-item ms-4" type="submit">&#10060;</button>
                             </form>
+                                @endif
+                                @endif
                             </li>
-                           
+                            </div>
+                           @endforeach
                             <li><hr class="dropdown-divider"></li>
                             <li class="px-3"><a class="btn btn-sm btn-primary w-100 text-center text-white" href="add_user.php">Add Member</a></li>
                         </ul>
                     </li>
-
+@endif
 
  <!-- add member ends -->
                     <form method="POST" action="{{ route('user.logout') }}" style="display:inline;">
@@ -146,7 +169,7 @@
                         <div class="mb-3">💳</div>
                         <h5>Bills</h5>
                         <p class="small text-muted">Secure online portal for monthly fees.</p>
-                        <a href="bills.php" class="btn btn-sm btn-outline-primary mt-auto">Show bills</a>
+                        <a href="{{ route('show.my.bill') }}" class="btn btn-sm btn-outline-primary mt-auto">Show bills</a>
                     </div>
                 </div>
                 <div class="col-md-6">
@@ -202,8 +225,8 @@
             <h5 class="mb-0">Host a New Event</h5>
         </div>
         <div class="card-body p-4">
-            <form action="events.php" method="POST">
-                
+            <form action="{{ route('events.store') }}" method="POST">
+                @csrf
                 <div class="mb-3">
                     <label for="title" class="form-label fw-semibold">Event Title</label>
                     <input type="text" class="form-control" id="title" name="title" placeholder="Enter a catchy title" required>
@@ -213,17 +236,21 @@
                     <label for="description" class="form-label fw-semibold">Description</label>
                     <textarea class="form-control" id="description" name="description" rows="4" placeholder="What is this event about?" required></textarea>
                 </div>
-
+                <input type="hidden" name="host_id" value="{{ auth()->user()->id }}">
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label for="date" class="form-label fw-semibold">Date</label>
                         <input type="date" class="form-control" id="date" name="date" required>
                     </div>
-
+                    
                     <div class="col-md-6 mb-3">
                         <label for="time" class="form-label fw-semibold">Time</label>
                         <input type="time" class="form-control" id="time" name="time" required>
                     </div>
+                </div>
+                <div class="mb-3">
+                    <label for="location" class="form-label fw-semibold">Location</label>
+                    <input type="text" class="form-control" id="location" name="location" placeholder="Enter location" required>
                 </div>
 
                 <div class="d-grid mt-4">

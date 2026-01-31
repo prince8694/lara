@@ -23,6 +23,11 @@
 
                     <form action="{{ route('login') }}" method="post">
                         @csrf
+                        @if(session('error'))
+                            <div class="alert alert-danger">
+                                {{ session('error') }}
+                            </div>
+                            @endif
                         <div class="mb-3">
                             <label class="form-label">Email</label>
                             <input type="email" name="email" class="form-control" placeholder="Enter email" required>

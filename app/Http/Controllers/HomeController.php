@@ -35,6 +35,16 @@ class HomeController extends Controller
         };
     }
 
+    public function dlthome($home_id){
+        $home=Home::find($home_id);
+        if($home){
+            $home->delete();
+            return back()->with('success', 'Home deleted successfully...');
+        }else{
+            return back()->with('error', 'Home not found...');
+        }
+    }
+
     /**
      * Store a newly created resource in storage.
      */

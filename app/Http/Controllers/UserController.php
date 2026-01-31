@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Home;
+use App\Models\Complaint;
+use App\Models\Event;
+use App\Models\Bill;
 
 class UserController extends Controller
 {
@@ -55,7 +58,8 @@ class UserController extends Controller
             if(auth()->user()->user_type == 'committee'){
                 return redirect()->route('admin.dash')->with('success', 'Welcome to the Admin Panel');
             }else if(auth()->user()->user_type == 'owner' || auth()->user()->user_type == 'member'){
-                return redirect()->route('home')->with('success', 'Welcome to the Admin Panel');
+                $house_no = auth()->user()->house_no;
+                return redirect()->route('userhome',$house_no)->with('success', 'Welcome to the Admin Panel');
             }
         }
             return back()->with('error', 'incorrect credentials');
@@ -63,21 +67,26 @@ class UserController extends Controller
     }
 // admin page display function
     public function admin(){
-        
+        $bills = Bill::orderBy('created_at', 'desc')->get();
         $holders=User::whereIn('user_type',['owner','member'])->orderBy('house_no', 'asc')->get(); //users where user type is owner or member order by house no
         $staffs=User::where('user_type','=','Staff')->get();
         $committee = User::where('committee','=','1')->get();
         $homes = Home::orderBy('house_no', 'asc')->get();;
         $vacantHomes= Home::where('house_status','0')->get();
         $occupiedHomes =Home::where('house_status','1')->get();
-        return view('admin_dashboard', compact('committee', 'homes','vacantHomes','occupiedHomes','holders','staffs'));
+        return view('admin_dashboard', compact('committee', 'homes','vacantHomes','occupiedHomes','holders','staffs', 'bills'));
     }
     public function logout(Request $request){
         auth()->logout();
         return redirect()->route('index')->with('success','User logged out...');
     }
 
-    public function home(){
+    public function home($house_no){
+        $members=User::whereIn('user_type',['owner','member'])->where('house_no',$house_no)->get();
+        return view('home', compact('members'));
+    }
+
+        public function adminhome(){
         return view('home');
     }
 // edit page
