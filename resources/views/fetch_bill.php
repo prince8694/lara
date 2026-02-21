@@ -1,32 +1,32 @@
 <?php
-require_once '../config/Database.php';
-require_once '../includes/auth.php';
-require_once '../models/Bill.php';
+use app\Models\Bill;
+use app\Models\User;
+use app\Http\Controllers\BillController;
 
-$db = new Database();
-$conn = $db->getConnection();
+
 
 $bill = new Bill();
-
-if (isset($_POST['request'])) {
-    $request = $_POST['request'];
+if(isset($_POST['status'])) {
+    $request = $_POST['status'];
     if ($request == 'All') {
-        $result = $bill->getAllBills();
-    }else{
-    $result = $bill->filterBills($request);
+        $result = Bill::orderBy('created_at', 'desc')->get();
+    }else if ($request == 'pending') {
+    $result = Bill::where('status', 'unpaid')->orderBy('created_at', 'desc')->get();
+    }else {
+    $result = Bill::where('status', 'paid')->orderBy('created_at', 'desc')->get();
     }
-    $count = $result->rowCount(); 
+    $count = $result->count(); 
     if($count > 0) {
-    while($row = $result->fetch(PDO::FETCH_ASSOC)) {
+    foreach($result as $row) {
 ?>
     <tr>
-        <td><?= $row['house_no']; ?></td>
-        <td><?= $row['bill']; ?></td>
-        <td class="fw-bold text-dark">$<?= number_format($row['amount'], 2); ?></td>
-        <td><?= $row['month']; ?></td>
+        <td><?= $row->house_no; ?></td>
+        <td><?= $row->bill; ?></td>
+        <td class="fw-bold text-dark">$<?= number_format($row->amount, 2); ?></td>
+        <td><?= $row->month; ?></td>
         <td>
-            <span class="status-badge <?= $row['bill_status'] == 'paid' ? 'bg-success text-white' : 'bg-warning text-dark' ?>">
-                <?= strtoupper($row['bill_status']); ?>
+            <span class="status-badge <?= $row->status == 'paid' ? 'bg-success text-white' : 'bg-warning text-dark' ?>">
+                <?= strtoupper($row->status); ?>
             </span>
         </td>
     </tr>

@@ -32,7 +32,7 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item"><a class="btn btn-primary ms-lg-3" href="{{ route('loginform') }}">Login</a></li>
-                    <li class="nav-item"><a class="btn btn-primary ms-lg-3" href="{{ route('register') }}">Register</a></li>
+                    <!-- <li class="nav-item"><a class="btn btn-primary ms-lg-3" href="">Register</a></li> -->
                 </ul>
             </div>
         </div>

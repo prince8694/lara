@@ -23,6 +23,6 @@ class Home extends Model
     ];
 
     public function owner(){
-        return $this->hasOne(User::class,'id','owner_id');
+        return $this->belongsTo(User::class,'house_no','house_no');
     }
 }

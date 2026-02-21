@@ -45,4 +45,27 @@ class BillController extends Controller
         $bills = Bill::where('generated_by', $userId)->orderBy('created_at', 'desc')->get();
         return view('show_bills', compact('bills'));
     }
+
+    public function showmybill($id){
+        $bills = Bill::where('home_id', $id)->orderBy('created_at', 'desc')->get();
+        return view('showmybills', compact('bills'));
+    }
+
+    public function paybill($id){
+        $bill = Bill::find($id);
+        if($bill){
+            $bill->status = 'paid';
+            $bill->save();
+            return back()->with('success', 'Bill paid successfully...');
+        }
+    }
+
+
+    public function fetchbill(Request $request){
+        $request->validate([
+            'filter'=>'required'
+        ]);
+        $filter = $request->input('filter');
+        return view('fetch_bill', compact('filter'));
+    }
 }

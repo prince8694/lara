@@ -1,16 +1,11 @@
-@if (!Auth::check() || Auth::user()->role !== 'admin')
-    @php
-        header("Location: " . route('user.logout'));
-        exit();
-    @endphp
-@endif
+@props(['title'])
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ProAdmin | Dashboard</title>
+    <title>ProAdmin | {{ $title }}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -136,22 +131,37 @@
 <body>
 
 <nav id="sidebar">
+@auth
+    @if(auth()->user()->committee == 1)
+        <div class="px-4 mb-4">
+            <h4 class="fw-bold text-white"><i class="fas fa-shield-alt me-2"></i>ProAdmin</h4>
+        </div>
+        <div class="nav flex-column">
+            <a href="{{ route('admin.dash') }}" class="nav-link active" onclick="showSection('dashboard-overview')">
+                <i class="fas fa-th-large"></i> Dashboard
+            </a>
+        </div>
+                <hr class="mx-3 opacity-25">
+        <a href="{{ route('home') }}" class="nav-link"><i class="fas fa-home"></i> Home</a>
+        <form method="POST" action="{{ route('user.logout') }}" style="display:inline;">
+            @csrf
+            <button type="submit" class="nav-link text-danger" style="background:none;border:none;cursor:pointer;"><i class="fas fa-sign-out-alt"></i> Logout</button>
+        </form>
+
+@else
     <div class="px-4 mb-4">
-        <h4 class="fw-bold text-white"><i class="fas fa-shield-alt me-2"></i>ProAdmin</h4>
+        <h4 class="fw-bold text-white"><i class="fas fa-shield-alt me-2"></i>User</h4>
     </div>
     <div class="nav flex-column">
-        <a href="{{ route('admin.dash') }}" class="nav-link active" onclick="showSection('dashboard-overview')">
-            <i class="fas fa-th-large"></i> Dashboard
-</a>
-        
-
         <hr class="mx-3 opacity-25">
-        <a href="#" class="nav-link"><i class="fas fa-home"></i> Home</a>
+        <a href="{{ route('userhome', auth()->user()->house_no ) }}" class="nav-link"><i class="fas fa-home"></i> Home</a>
         <form method="POST" action="{{ route('user.logout') }}" style="display:inline;">
             @csrf
             <button type="submit" class="nav-link text-danger" style="background:none;border:none;cursor:pointer;"><i class="fas fa-sign-out-alt"></i> Logout</button>
         </form>
     </div>
+        @endif
+@endauth
 </nav>
 
 <div id="main-content">

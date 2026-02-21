@@ -51,6 +51,10 @@ class User extends Authenticatable
     }
 
     public function home(){
-        return $this->belongsTo(Home::class,'house_no','house_no');
+        return $this->hasMany(Home::class,'house_no','house_no');
+    }
+
+    public function complaint(){
+        return $this->hasMany(Complaint::class);
     }
 }

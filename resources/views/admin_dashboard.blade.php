@@ -1,15 +1,10 @@
-@if(!Auth::check())
-    return redirect()->route('user.logout');
-@endif
-@if(Auth::user()->committee != 1)
-    return redirect()->route('home');
-    @endif
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>ProAdmin | Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
@@ -561,13 +556,13 @@
                                     <i class="fas fa-exchange-alt"></i>
                                 </a>
 
-                                <form action="" method="POST">
+                                <!-- <form action="" method="POST">
                                     @csrf
                                     @method('PATCH')
                                     <button type="submit" title="Remove Owner" class="btn btn-outline-warning btn-sm" onclick="return confirm('Demote this owner to a member?')">
                                         <i class="fas fa-user-minus"></i>
                                     </button>
-                                </form>
+                                </form> -->
                                 @else
                                     <button type="submit" title="Add owner" class="btn btn-outline-success btn-sm" onclick="showSection('holderform')">
                                         <i class="fas fa-user-plus"></i>
@@ -634,6 +629,9 @@
                         @endforeach
                     </tbody>
                 </table>
+                <div>
+                    {{ $holders->links() }}
+                </div>
             </div>
         </div>
     </div>
@@ -653,11 +651,27 @@
                             <th>House No</th>
                             <th>Complaint</th>
                             <th>Status</th>
+                            <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr><td>1</td><td class="fw-bold">Charlie Brown</td><td>101-A</td><td>Leaking pipe in kitchen</td><td><span class="status-badge bg-danger text-white">open</span></td></tr>
-                        <tr><td>2</td><td class="fw-bold">David Wilson</td><td>102-B</td><td>Security light broken</td><td><span class="status-badge bg-success text-white">closed</span></td></tr>
+                        @foreach($complaints as $complaint)
+                        <tr>
+                            <td>{{ $loop->iteration }}</td>
+                            <td class="fw-bold">{{ $complaint->user->name }}</td>
+                            <td>{{ $complaint->user->house_no }}</td>
+                            <td>{{ $complaint->description }}</td>
+                            <td><span class="status-badge bg-danger text-white">{{ $complaint->status }}</span></td>
+                            <td class="text-left">
+                                <a href="" class="text-warning me-3" title="Assign staff">
+                                    <i class="fa fa-share-square "></i>
+                                </a>
+                                <a href="{{ route('done.complaint', $complaint->id) }}" class="text-success" title="mark as done">
+                                    <i class="fas fa fa-thumbs-up"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        @endforeach
                     </tbody>
                 </table>
             </div>
@@ -710,11 +724,11 @@
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <span>Financial Overview</span>
-                <select class="form-select form-select-sm" id="fetchval" style="width: auto;">
+                <!-- <select class="form-select form-select-sm" id="fetchval" style="width: auto;">
                     <option value="All">All Bills</option>
                     <option value="pending">Pending</option>
                     <option value="paid">Paid</option>
-                </select>
+                </select> -->
             </div>
             <div class="table-responsive">
                 <table class="table table-hover align-middle">
@@ -788,8 +802,34 @@
             });
         });
 
+    });
+</script>
+<script type="text/javascript">
+    $(document).ready(function(){
         $('#fetchval').on('change', function(){
-            alert("Filtering for: " + $(this).val());
+            var value = $(this).val();
+            alert(value);
+            $.ajax({
+                url: 'fetch.bill.php',
+                type: "POST",
+                data: 'request:='+value,
+                dataType: 'html',
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                beforeSend: function(){
+                    $("#billdata").html('Working...');
+                },
+                success: function(data){
+                    console.log('fetch_bill success', data);
+                    $("#billdata").html(data);
+                },
+                error: function(xhr, status, err){
+                    console.error('fetch_bill error', status, err, xhr.responseText);
+                    $("#billdata").html('<div class="text-danger">Error loading bills. Check console for details.</div>');
+                }
+            });
+            
         });
     });
 </script>

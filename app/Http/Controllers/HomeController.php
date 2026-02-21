@@ -12,7 +12,9 @@ class HomeController extends Controller
      */
     public function index()
     {
-        //
+       $homes= Home::all();
+       return view('home',compact('homes'));
+
     }
 
     /**

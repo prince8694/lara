@@ -49,7 +49,7 @@
                 </div>
 
                 <div class="card-footer text-center">
-                    <small>New user? <a href="{{ route('register') }}">Register here</a></small>
+                    <small> <a href="{{ route('home') }}">Back</a></small>
                 </div>
 
             </div>

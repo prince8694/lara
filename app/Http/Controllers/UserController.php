@@ -9,8 +9,9 @@ use App\Models\Complaint;
 use App\Models\Event;
 use App\Models\Bill;
 
-class UserController extends Controller
-{
+class UserController extends Controller{
+
+
     public function loginpage(){
         if(auth()->check()){
             return redirect()->route('admin.dash');
@@ -36,6 +37,9 @@ class UserController extends Controller
             $user=User::where('house_no',$request->house_no)->count();
             if($user==0){
                 return back()->with('error', 'Property doesnot have an owner...');
+            }else{
+                $data['user_type']='member';
+                $data['house_no']=$request->house_no;
             }
         }
         $user=User::create($data);
@@ -67,14 +71,21 @@ class UserController extends Controller
     }
 // admin page display function
     public function admin(){
+        if(!auth()->check()){
+    return redirect()->route('loginform');
+    }
+    if(auth()->user()->user_type != 'committee'){
+        return redirect()->route('userhome', auth()->user()->house_no)->with('error', 'Unauthorized access');
+    }
         $bills = Bill::orderBy('created_at', 'desc')->get();
-        $holders=User::whereIn('user_type',['owner','member'])->orderBy('house_no', 'asc')->get(); //users where user type is owner or member order by house no
+        $holders=User::whereIn('user_type',['owner','member'])->orderBy('house_no', 'asc')->paginate(10); //users where user type is owner or member order by house no
         $staffs=User::where('user_type','=','Staff')->get();
         $committee = User::where('committee','=','1')->get();
         $homes = Home::orderBy('house_no', 'asc')->get();;
         $vacantHomes= Home::where('house_status','0')->get();
         $occupiedHomes =Home::where('house_status','1')->get();
-        return view('admin_dashboard', compact('committee', 'homes','vacantHomes','occupiedHomes','holders','staffs', 'bills'));
+        $complaints = Complaint::orderBy('created_at', 'desc')->get();
+        return view('admin_dashboard', compact('committee', 'homes','vacantHomes','occupiedHomes','holders','staffs', 'bills', 'complaints'));
     }
     public function logout(Request $request){
         auth()->logout();
@@ -83,7 +94,8 @@ class UserController extends Controller
 
     public function home($house_no){
         $members=User::whereIn('user_type',['owner','member'])->where('house_no',$house_no)->get();
-        return view('home', compact('members'));
+        $events=Event::all();
+        return view('home', compact('members', 'events'));
     }
 
         public function adminhome(){
@@ -141,6 +153,10 @@ class UserController extends Controller
         ]);
         return redirect()->route('admin.dash')->with('success','Owner updated successfully...');
 
+    }
+
+    public function addMember(){
+        return view('addmember');
     }
     
 }

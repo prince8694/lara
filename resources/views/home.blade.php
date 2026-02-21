@@ -100,10 +100,11 @@
                             @if(auth()->user()['user_type'] == 'owner') 
                                 @if($member->user_type != 'owner')       
                                 <!-- <a class=" dropdown-item text-success" href="profile.php"> &#x2714;</a> -->
-                                 <form method="post" class= "d-inline" onsubmit = "return confirm('are you sure to delete??');">
+                                 <form action="" method="post" class= "d-inline" onsubmit = "return confirm('are you sure to delete??');">
+                                    @csrf
                                     <input type="hidden" value="delete" name="action">
                                     <input type="hidden" value="{{ $member->id }}" name="memId">
-                                <button class="dropdown-item ms-4" type="submit">&#10060;</button>
+                                <a href="{{ route('dlt.holder',$member->id )  }}" class="dropdown-item ms-4" type="submit">&#10060;</a>
                             </form>
                                 @endif
                                 @endif
@@ -111,7 +112,9 @@
                             </div>
                            @endforeach
                             <li><hr class="dropdown-divider"></li>
-                            <li class="px-3"><a class="btn btn-sm btn-primary w-100 text-center text-white" href="add_user.php">Add Member</a></li>
+                            <li class="px-3">
+                                <a class="btn btn-sm btn-primary w-100 text-center text-white" href="{{ route('add.member') }}">Add Member</a>
+                            </li>
                         </ul>
                     </li>
 @endif
@@ -169,7 +172,7 @@
                         <div class="mb-3">💳</div>
                         <h5>Bills</h5>
                         <p class="small text-muted">Secure online portal for monthly fees.</p>
-                        <a href="{{ route('show.my.bill') }}" class="btn btn-sm btn-outline-primary mt-auto">Show bills</a>
+                        <a href="{{ route('show.my.bill', auth()->user()->home()->first()->id) }}" class="btn btn-sm btn-outline-primary mt-auto">Show bills</a>
                     </div>
                 </div>
                 <div class="col-md-6">
@@ -177,7 +180,7 @@
                         <div class="mb-3">🔧</div>
                         <h5>Maintenance</h5>
                         <p class="small text-muted">Report issues or request repairs.</p>
-                        <a href="complaint.php" class="btn btn-sm btn-outline-primary mt-auto">Raise Ticket</a>
+                        <a href="{{ route('complaint.form') }}" class="btn btn-sm btn-outline-primary mt-auto">Raise Ticket</a>
 
 
 </div> 
@@ -195,24 +198,25 @@
             <div class="row align-items-center">
                 <div class="col-lg-6">
                     <h2 class="mb-4">Upcoming Events</h2>
-                    <ul class="list-group list-group-flush shadow-sm">
-                        
+                    <ul class="list-group list-group-flush shadow-sm"> 
+                        @foreach($events as $event)
                         <li class="list-group-item d-flex justify-content-between align-items-center">
                             
                             <div>
-                                <button class="btn btn-link bg-white rounded-pill link-success link-underline-opacity-0 link-underline-opacity-100-hover" type="button" data-bs-toggle="collapse" data-bs-target="#eventDesc" aria-expanded="false" aria-controls="eventDesc">
-                                    View Details
+                                <button class="btn btn-link bg-white rounded-pill link-success link-underline-opacity-0 link-underline-opacity-100-hover" type="button" data-bs-toggle="collapse" data-bs-target="#eventDesc{{ $event->id }}" aria-expanded="false" aria-controls="eventDesc{{ $event->id }}">
+                                    View Details of {{ $event->title }}
                                 </button>
-                                <div class="collapse" id="eventDesc">
+                                <div class="collapse" id="eventDesc{{ $event->id }}">
                                     <div class="card card-body mt-2">
-                                        
+                                      {{  $event->description }} function will be held at {{ $event->location }} on {{ \Carbon\Carbon::parse($event->event_date)->format('d M Y') }} at {{ \Carbon\Carbon::parse($event->event_time)->format('h:i A') }}.
                                     </div>
                                 </div>
                             </div>
-                            <span class="badge bg-primary rounded-pill">Hosted by </span>
-                            <span class="badge bg-primary rounded-pill">Date</span>
+                            <span class="badge bg-primary rounded-pill">Hosted by {{ $event->host->name }}</span>
+                            <span class="badge bg-primary rounded-pill">{{ \Carbon\Carbon::parse($event->event_date)->format('d M Y') }}</span>
+                            
                         </li>
-                       
+                       @endforeach
                         <li class="list-group-item  justify-content-between align-items-center">
                             <button onclick="EventForm()" class="btn btn-white link-success link-underline-opacity-0 link-underline-opacity-100-hover">Host an Event</button>
 
