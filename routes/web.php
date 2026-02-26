@@ -6,8 +6,16 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\BillController;
 use App\Http\Controllers\ComplaintController;
+use Illuminate\Support\Facades\Mail;
 
+Route::get('/test-brevo', function () {
+    Mail::raw('Hello from Brevo!', function ($message) {
+        $message->to('your-personal-email@gmail.com')
+                ->subject('Brevo Test');
+    });
 
+    return "Check your inbox!";
+});
 
 Route::get('/', function () {
     if(auth()->check()){

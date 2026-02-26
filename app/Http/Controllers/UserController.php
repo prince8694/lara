@@ -10,6 +10,8 @@ use App\Models\Event;
 use App\Models\Bill;
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\LoginRequest;
+use App\Mail\UserCreatedMail;
+use Illuminate\Support\Facades\Mail;
 
 class UserController extends Controller{
 
@@ -37,6 +39,7 @@ class UserController extends Controller{
             }
         }
         $user=User::create($data);
+        Mail::to($user->email)->send(new UserCreatedMail($user));
         if($request['user_type']=='owner'){
             Home::where('house_no',$request->house_no)->update(['owner_id'=>$user->id,'house_status'=>'1']);
         }
