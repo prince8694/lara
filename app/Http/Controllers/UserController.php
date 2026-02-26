@@ -8,6 +8,8 @@ use App\Models\Home;
 use App\Models\Complaint;
 use App\Models\Event;
 use App\Models\Bill;
+use App\Http\Requests\StoreUserRequest;
+use App\Http\Requests\LoginRequest;
 
 class UserController extends Controller{
 
@@ -23,16 +25,8 @@ class UserController extends Controller{
         return view('register');
     }
 
-    public function saveuser(Request $request){
-        $data = $request->validate([
-            'name' =>'required',
-            'email'=>'required|email|unique:users,email',
-            'house_no'=>'nullable',
-            'password'=> 'required',
-            'user_type'=>'nullable',
-            'role'=>'nullable', 
-            'committee'=>'nullable'
-        ]);
+    public function saveuser(StoreUserRequest $request){
+        $data = $request->validated();
         if($request['user_type']=='member'){
             $user=User::where('house_no',$request->house_no)->count();
             if($user==0){
@@ -53,11 +47,8 @@ class UserController extends Controller{
         }
     } 
 
-    public function login(Request $request){
-        $request->validate([
-            'email' =>'required|email',
-            'password' => 'required'
-        ]);
+    public function login(LoginRequest $request){
+        $request->validated();
         if(auth()->attempt(['email'=>$request->email,'password'=> $request->password])){
             if(auth()->user()->user_type == 'committee'){
                 return redirect()->route('admin.dash')->with('success', 'Welcome to the Admin Panel');

@@ -4,27 +4,19 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Bill;
+use App\Http\Requests\BillRequest;
+use App\Services\BillService;
+
 class BillController extends Controller
 {
-    public function addbill(Request $request){
-        $request->validate([
-            'house_no'=>'required|exists:homes,id',
-            'user_id'=>'required|exists:users,id',
-            'bill'=>'required',
-            'amount'=>'required|numeric',
-            'bill_month'=>'required'
-        ]);
+    public function addbill(BillRequest $request){
+        $request=$request->validated();
         // Logic to save the bill details to the database
         // Assuming you have a Bill model
-        $bill = new Bill();
-        $bill->home_id = $request->house_no;
-        $bill->bill_type = $request->bill;
-        $bill->amount = $request->amount;
-        $bill->month = $request->bill_month;
-        $bill->generated_by = $request->user_id;
-        $bill->save();
+        $billService = new BillService();
+        $billService->addBill($request);
 
-        if($bill){
+        if($billService){
             return back()->with('success', 'Bill added successfully...');
         }else{
             return back()->with('error', 'Failed to add bill...');
